@@ -3,11 +3,11 @@ namespace DotNet8WebAPI.Services
 {
     public interface IOurHeroService
     {
-        List<OurHero> GetAllHeros(bool? isActive);
-        OurHero? GetHeroById(int id);
-        OurHero? AddOurHero(AddUpdateOurHero obj);
-        OurHero? UpdateOurHero(int id, AddUpdateOurHero obj);
-        bool DeleteHerosById(int id);
+        Task<List<OurHero>> GetAllHeros(bool? isActive);
+        Task<OurHero?> GetHeroById(int id);
+        Task<OurHero?> AddOurHero(AddUpdateOurHero obj);
+        Task<OurHero?> UpdateOurHero(int id, AddUpdateOurHero obj);
+        Task<bool> DeleteHerosById(int id);
 
     }
 }

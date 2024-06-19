@@ -1,73 +1,69 @@
 ﻿using DotNet8WebAPI.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotNet8WebAPI.Services
 {
     public class OurHeroService : IOurHeroService
     {
-        private readonly List<OurHero> _ourHeroesList;
-
-        public OurHeroService()
+        private readonly OurHeroDbContext _db;
+        public OurHeroService(OurHeroDbContext db)
         {
-            _ourHeroesList = new List<OurHero>()
-            {
-                new OurHero()
-                {
-                    Id=1,
-                    FirstName="Test",
-                    LastName="Test",
-                    isActive=true,
-                }
-            };
+            _db = db;
         }
-        public List<OurHero> GetAllHeros(bool? isActive)
+        public async Task<List<OurHero>> GetAllHeros(bool? isActive)
         {
-            return isActive == null ? _ourHeroesList : _ourHeroesList.Where(hero => hero.isActive == isActive).ToList();
-        }
-
-        public bool DeleteHerosById(int id)
-        {
-            var ourHeroIndex= _ourHeroesList.FindIndex(index=>index.Id==id);
-            if (ourHeroIndex >= 0)
+            if ((isActive!=null))
             {
-                _ourHeroesList.RemoveAt(ourHeroIndex);
+                return await _db.OurHeros.Where(m=>m.isActive==isActive).ToListAsync();
             }
-            return ourHeroIndex >= 0;
+            return await _db.OurHeros.ToListAsync();
         }
 
-        public OurHero AddOurHero(AddUpdateOurHero obj)
+        public async Task<bool> DeleteHerosById(int id)
+        {
+            var hero= await _db.OurHeros.FirstOrDefaultAsync(index=>index.Id==id);
+            if (hero!= null)
+            {
+                _db.OurHeros.Remove(hero);
+                var result=await _db.SaveChangesAsync();
+                return result >= 0;
+            }
+            return false;
+        }
+
+        public async Task<OurHero?> AddOurHero(AddUpdateOurHero obj)
         {
             var addHero = new OurHero()
             {
-                Id = _ourHeroesList.Max(hero => hero.Id) + 1,
                 FirstName = obj.FirstName,
                 LastName = obj.LastName,
                 isActive = obj.isActive,
             };
-            _ourHeroesList.Add(addHero);
-            return addHero;
+             _db.OurHeros.Add(addHero);
+            var result= await _db.SaveChangesAsync();
+            return result>=0?addHero : null;
         } 
 
-        public OurHero? GetHeroById(int id)
+        public async Task<OurHero?> GetHeroById(int id)
         {
-            return _ourHeroesList.FirstOrDefault(hero=>hero.Id== id);
+            return await _db.OurHeros.FirstOrDefaultAsync(hero=>hero.Id== id);
         }
 
-        public OurHero? UpdateOurHero(int id, AddUpdateOurHero obj)
+        public async Task<OurHero?> UpdateOurHero(int id, AddUpdateOurHero obj)
         {
-            var ourHeroIndex=_ourHeroesList.FindIndex(index=>index.Id== id);
-            if (ourHeroIndex >= 0)
+            var hero=await _db.OurHeros.FirstOrDefaultAsync(index=>index.Id == id);
+            if (hero!=null)
             {
-                var hero = _ourHeroesList[ourHeroIndex];
                 hero.FirstName = obj.FirstName;
                 hero.LastName = obj.LastName;
                 hero.isActive = obj.isActive;
-                _ourHeroesList[ourHeroIndex] = hero;
-                return hero;
+
+                var result=await _db.SaveChangesAsync();
+                return result>=0?hero : null;
             }
-            else
-            {
+
                 return null;
-            }
+            
         }
     }
 }
