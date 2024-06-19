@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 namespace DotNet8WebAPI
 {
-    public class OurHeroDbContext:DbContext
+    public class OurHeroDbContext : DbContext
     {
         public OurHeroDbContext(DbContextOptions<OurHeroDbContext> options) : base(options)
         {
@@ -10,9 +10,11 @@ namespace DotNet8WebAPI
 
         }
         public DbSet<OurHero> OurHeros { get; set; }
+        public DbSet<User> Users { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<OurHero>().HasKey(x=>x.Id);
+            modelBuilder.Entity<OurHero>().HasKey(x => x.Id);
             modelBuilder.Entity<OurHero>().HasData(
                 new OurHero
                 {
@@ -22,7 +24,16 @@ namespace DotNet8WebAPI
                     isActive = true,
                 }
                 );
-        }
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    FirstName = "System",
+                    LastName = "System",
+                    Username = "System",
+                    Password = "System",
+                });
 
+        }
     }
 }

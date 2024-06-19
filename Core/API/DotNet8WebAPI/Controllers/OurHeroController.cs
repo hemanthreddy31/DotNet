@@ -1,5 +1,6 @@
 ﻿using DotNet8WebAPI.Model;
 using DotNet8WebAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace DotNet8WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OurHeroController : ControllerBase
     {
         private readonly IOurHeroService _heroService;
